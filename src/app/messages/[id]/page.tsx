@@ -5,7 +5,6 @@ import MessageList from '@/components/messages/MessageList';
 import MessageInput from '@/components/messages/MessageInput';
 import { createSupabaseServerClient } from '@/lib/supabaseServer';
 
-
 export default async function MessagePage({ params }: { params: { id: string } }) {
   const { userId } = await auth();
   const friendId = params.id;
@@ -37,7 +36,11 @@ export default async function MessagePage({ params }: { params: { id: string } }
       <div className="flex flex-col h-full max-w-2xl mx-auto py-6">
         <h1 className="text-xl font-light text-gray-200 mb-4">Chat</h1>
         <div className="flex-1 flex flex-col bg-gray-900/70 rounded-xl shadow p-4">
-          <MessageList messages={messages || []} currentUserId={userId} />
+          <MessageList 
+            messages={messages || []} 
+            currentUserId={userId} 
+            friendId={friendId} 
+          />
           <div className="mt-2">
             <MessageInput onSend={handleSend} />
           </div>
