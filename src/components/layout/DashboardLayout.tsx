@@ -1,13 +1,12 @@
 import { ReactNode } from 'react';
 import Sidebar from '@/components/sidebar/Sidebar';
-import { auth } from '@clerk/nextjs';
-
+import { auth } from '@clerk/nextjs/server';
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { userId } = auth();
+  const { userId } = await auth();
   
   if (!userId) {
     return null;
