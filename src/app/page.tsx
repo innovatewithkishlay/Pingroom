@@ -5,85 +5,173 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-950 to-gray-900 flex flex-col justify-between">
-      {/* Top Navigation Bar */}
-      <header className="flex items-center justify-between px-8 py-4">
-        <div className="text-xl font-semibold tracking-tight text-indigo-400">PingRoom</div>
-        <nav className="flex gap-4">
-          <Link href="/sign-in" className="text-gray-300 hover:text-indigo-400 transition text-sm font-medium">
-            Sign In
-          </Link>
-          <Link href="/sign-up" className="text-gray-300 hover:text-indigo-400 transition text-sm font-medium">
-            Sign Up
-          </Link>
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex flex-col relative overflow-hidden">
+      {/* Subtle animated background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #6366f1 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+      </div>
+
+      {/* Header: navigation only */}
+      <header className="flex items-center justify-end px-8 py-6 z-10 backdrop-blur-sm">
+        <nav className="flex gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <Link
+              href="/sign-in"
+              className="group relative px-4 py-2 text-gray-400 hover:text-indigo-300 text-sm font-medium transition-all duration-300"
+            >
+              <span className="relative z-10">Sign In</span>
+              <div className="absolute inset-0 rounded-lg bg-gray-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </Link>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Link
+              href="/sign-up"
+              className="group relative px-4 py-2 text-gray-400 hover:text-indigo-300 text-sm font-medium transition-all duration-300"
+            >
+              <span className="relative z-10">Sign Up</span>
+              <div className="absolute inset-0 rounded-lg bg-gray-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </Link>
+          </motion.div>
         </nav>
       </header>
 
-      {/* Hero and Features, spread out */}
-      <main className="flex-1 flex flex-col md:flex-row items-center justify-between px-8 md:px-20 py-12 gap-8">
-        {/* Left: Tagline and Call to Action */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
+      {/* Main content */}
+      <main className="flex-1 flex flex-col md:flex-row items-stretch justify-stretch relative z-10">
+        {/* Left: PingRoom hero, subheadline, CTA */}
+        <motion.section
+          initial={{ opacity: 0, x: -60 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="flex-1 flex flex-col items-start"
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="flex-1 flex flex-col justify-center px-8 md:pl-20 py-12"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4 leading-tight">
-            Connect. Chat. Collaborate.<br />
-            <span className="text-indigo-400 font-extrabold">PingRoom</span> is your modern workspace for real-time communication.
-          </h1>
-          <p className="text-gray-400 text-base md:text-lg mb-6 max-w-lg">
-            Effortless messaging, instant video calls, and seamless friend management—built for teams, friends, and creators who value privacy and speed.
-          </p>
-          <div className="flex gap-4">
-            <Link href="/sign-in" className="px-6 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition">
-              Get Started
+          <motion.h1
+            className="text-5xl md:text-6xl font-extrabold text-indigo-400 mb-3 tracking-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            PingRoom
+          </motion.h1>
+          <motion.h2
+            className="text-2xl md:text-3xl font-light text-gray-100 mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.7 }}
+          >
+            Where connections flow.
+          </motion.h2>
+          <motion.p
+            className="text-gray-400 text-base md:text-lg mb-8 max-w-md font-light leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
+            Effortless chat, video calls, and collaboration.<br />
+            <span className="text-indigo-300 font-medium">Minimal. Secure. Real-time.</span>
+          </motion.p>
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+          >
+            <Link href="/sign-in" className="group relative overflow-hidden">
+              <div className="relative px-8 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl font-medium text-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/25">
+                <span className="relative z-10 flex items-center gap-2">
+                  Get Started
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
             </Link>
-            <Link href="/sign-up" className="px-6 py-2 bg-gray-800 text-gray-200 rounded-md text-sm font-medium hover:bg-gray-700 transition">
-              Create Account
+            <Link href="/sign-up" className="group relative overflow-hidden">
+              <div className="relative px-8 py-3 bg-gray-800/50 backdrop-blur-sm text-gray-200 rounded-xl font-medium text-sm border border-gray-700/50 transition-all duration-300 group-hover:border-gray-600 group-hover:bg-gray-700/50">
+                <span className="relative z-10">Create Account</span>
+                <div className="absolute inset-0 bg-gray-700/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
             </Link>
-          </div>
-        </motion.div>
+          </motion.div>
+        </motion.section>
 
-        {/* Right: Features, spread out in a grid */}
-        <motion.ul
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-          className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-300"
+        {/* Right: 2-column features grid, no icons, no line */}
+        <motion.section
+          initial={{ opacity: 0, x: 60 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="flex-1 flex flex-col justify-center px-8 md:pr-20 py-12"
         >
-          <li className="flex items-center gap-3">
-            <span className="text-indigo-400 text-lg">💬</span>
-            Real-time 1:1 & group chat
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-yellow-300 text-lg">🎥</span>
-            HD video calls & screen sharing
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-green-400 text-lg">🔒</span>
-            Private, secure, no ads
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-pink-400 text-lg">⚡</span>
-            Instant friend requests
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-blue-400 text-lg">🌐</span>
-            Works on all your devices
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="text-gray-400 text-lg">🕒</span>
-            Always in sync, always fast
-          </li>
-        </motion.ul>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 mt-8 md:mt-0">
+            {[
+              {
+                heading: "Real-time chat & DMs",
+                desc: "Message instantly and privately, with no delays or distractions.",
+              },
+              {
+                heading: "HD video calls & screen sharing",
+                desc: "Connect face-to-face or share your screen in a single click.",
+              },
+              {
+                heading: "Private, secure, no ads",
+                desc: "Your conversations are encrypted and never sold.",
+              },
+              {
+                heading: "Instant friend requests",
+                desc: "Add, accept, or remove connections with a single tap.",
+              },
+              {
+                heading: "Works on all your devices",
+                desc: "Seamless experience on desktop, tablet, and mobile.",
+              },
+              {
+                heading: "Always in sync, always fast",
+                desc: "Stay updated everywhere, with lightning-fast performance.",
+              },
+            ].map((feature, idx) => (
+              <motion.li
+                key={feature.heading}
+                className="group relative"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + idx * 0.07, duration: 0.6 }}
+              >
+                <div className="text-base md:text-lg font-semibold text-gray-100 mb-1 tracking-tight">
+                  {feature.heading}
+                </div>
+                <div className="text-sm text-gray-400 font-light leading-snug max-w-xs">
+                  {feature.desc}
+                </div>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.section>
       </main>
 
       {/* Footer */}
-      <footer className="px-8 py-4 text-xs text-gray-500 flex justify-between items-center border-t border-gray-800">
+      <motion.footer
+        className="px-8 py-4 text-xs text-gray-500 flex justify-between items-center border-t border-gray-800/50 backdrop-blur-sm z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+      >
         <span>Made in India • Hindi & English friendly</span>
         <span>© {new Date().getFullYear()} PingRoom</span>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
