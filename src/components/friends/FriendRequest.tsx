@@ -7,43 +7,63 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface FriendRequest {
   id: string;
   sender_id: string;
+  receiver_id: string;
+  status: string;
+  created_at: string;
   senderName: string;
   senderAvatar?: string | null;
 }
 
 interface FriendRequestListProps {
   requests: FriendRequest[];
-  onAccept: (requestId: string) => Promise<void> | void;
-  onReject: (requestId: string) => Promise<void> | void;
+  userId: string; 
 }
 
-export default function FriendRequestList({
-  requests,
-  onAccept,
-  onReject,
-}: FriendRequestListProps) {
+export default function FriendRequestList({ requests, userId }: FriendRequestListProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [localRequests, setLocalRequests] = useState(requests);
 
   const handleAccept = async (id: string) => {
     setLoadingId(id);
-    await onAccept(id);
+    try {
+      const response = await fetch('/api/friends', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId: id, status: 'accepted' }),
+      });
+      if (response.ok) {
+        setLocalRequests(prev => prev.filter(req => req.id !== id));
+      }
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
     setLoadingId(null);
   };
 
   const handleReject = async (id: string) => {
     setLoadingId(id);
-    await onReject(id);
+    try {
+      const response = await fetch('/api/friends', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId: id, status: 'rejected' }),
+      });
+      if (response.ok) {
+        setLocalRequests(prev => prev.filter(req => req.id !== id));
+      }
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+    }
     setLoadingId(null);
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-gradient-to-br from-gray-900 to-gray-950 rounded-xl shadow-md p-4 mt-4">
-      <h3 className="text-sm font-medium text-gray-300 mb-3">Friend Requests</h3>
+    <div className="w-full bg-gradient-to-br from-gray-900 to-gray-950 rounded-xl shadow-md p-4 mt-2">
       <AnimatePresence>
-        {requests.length === 0 ? (
+        {localRequests.length === 0 ? (
           <motion.div
             key="no-requests"
-            className="text-gray-400 text-sm py-8 text-center"
+            className="text-gray-400 text-sm py-4 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -51,7 +71,7 @@ export default function FriendRequestList({
             No pending requests.
           </motion.div>
         ) : (
-          requests.map((req) => (
+          localRequests.map((req) => (
             <motion.div
               key={req.id}
               className="flex items-center gap-3 py-3 px-2 border-b border-gray-800 last:border-b-0"
@@ -71,24 +91,33 @@ export default function FriendRequestList({
                   {req.senderName.slice(0, 2).toUpperCase()}
                 </div>
               )}
-              <span className="text-sm font-light text-gray-100">{req.senderName}</span>
+              <span className="text-sm font-light text-gray-100">
+                {req.senderName}
+              </span>
               <div className="ml-auto flex gap-2">
-                <Button
-                  size="sm"
-                  variant="default"
-                  disabled={loadingId === req.id}
-                  onClick={() => handleAccept(req.id)}
-                >
-                  Accept
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={loadingId === req.id}
-                  onClick={() => handleReject(req.id)}
-                >
-                  Reject
-                </Button>
+                {req.receiver_id === userId && req.status === 'pending' && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      disabled={loadingId === req.id}
+                      onClick={() => handleAccept(req.id)}
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={loadingId === req.id}
+                      onClick={() => handleReject(req.id)}
+                    >
+                      Reject
+                    </Button>
+                  </>
+                )}
+                {req.sender_id === userId && req.status === 'pending' && (
+                  <span className="text-xs text-gray-400">Pending</span>
+                )}
               </div>
             </motion.div>
           ))
