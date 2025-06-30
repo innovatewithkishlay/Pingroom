@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
 
 interface FriendRequest {
   id: string;
@@ -16,44 +17,67 @@ interface FriendRequest {
 
 interface FriendRequestListProps {
   requests: FriendRequest[];
-  userId: string; 
+  userId: string;
 }
 
 export default function FriendRequestList({ requests, userId }: FriendRequestListProps) {
+  const [localRequests, setLocalRequests] = useState<FriendRequest[]>(requests);
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [localRequests, setLocalRequests] = useState(requests);
+
+  // Real-time subscription for new/updated friend requests
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    const channel = supabase
+      .channel('friend_requests')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `or=(sender_id.eq.${userId},receiver_id.eq.${userId})`,
+        },
+        (payload) => {
+          const req = payload.new as FriendRequest;
+          setLocalRequests((prev) => {
+            // Remove if rejected or accepted
+            if (req.status === 'rejected' || req.status === 'accepted') {
+              return prev.filter((r) => r.id !== req.id);
+            }
+            // Add or update the request
+            const exists = prev.find((r) => r.id === req.id);
+            if (exists) {
+              return prev.map((r) => (r.id === req.id ? req : r));
+            }
+            return [...prev, req];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   const handleAccept = async (id: string) => {
     setLoadingId(id);
-    try {
-      const response = await fetch('/api/friends', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId: id, status: 'accepted' }),
-      });
-      if (response.ok) {
-        setLocalRequests(prev => prev.filter(req => req.id !== id));
-      }
-    } catch (error) {
-      console.error('Error accepting friend request:', error);
-    }
+    await fetch('/api/friends', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestId: id, status: 'accepted' }),
+    });
     setLoadingId(null);
   };
 
   const handleReject = async (id: string) => {
     setLoadingId(id);
-    try {
-      const response = await fetch('/api/friends', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId: id, status: 'rejected' }),
-      });
-      if (response.ok) {
-        setLocalRequests(prev => prev.filter(req => req.id !== id));
-      }
-    } catch (error) {
-      console.error('Error rejecting friend request:', error);
-    }
+    await fetch('/api/friends', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestId: id, status: 'rejected' }),
+    });
     setLoadingId(null);
   };
 

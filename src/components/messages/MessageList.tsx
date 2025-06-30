@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
@@ -9,21 +10,47 @@ interface Message {
   receiver_id: string;
   content: string;
   created_at: string;
-  senderName?: string;
 }
 
 interface MessageListProps {
   messages: Message[];
   currentUserId: string;
+  friendId: string;
 }
 
-export default function MessageList({ messages, currentUserId }: MessageListProps) {
+export default function MessageList({ messages: initialMessages, currentUserId, friendId }: MessageListProps) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to the latest message
+  // Scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Supabase Realtime subscription
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    const channel = supabase
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `or=(and(sender_id.eq.${currentUserId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUserId}))`,
+        },
+        (payload) => {
+          setMessages((msgs) => [...msgs, payload.new as Message]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUserId, friendId]);
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 bg-gradient-to-br from-gray-900 to-gray-950 rounded-lg">
