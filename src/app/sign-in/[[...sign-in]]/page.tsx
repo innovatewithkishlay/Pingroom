@@ -91,9 +91,10 @@ export default function Page() {
                 <p className="text-gray-400 text-sm">Product Designer</p>
               </div>
             </div>
-            <p className="text-gray-300 text-sm italic">
-              "PingRoom has transformed how our team collaborates. The interface is so clean and the video quality is amazing!"
-            </p>
+          <p className="text-gray-300 text-sm italic">
+  &quot;PingRoom has transformed how our team collaborates. The interface is so clean and the video quality is amazing!&quot;
+</p>
+
           </motion.div>
         </div>
       </motion.div>
