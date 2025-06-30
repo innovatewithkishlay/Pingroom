@@ -1,3 +1,4 @@
+"use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, Users, MessageSquare, User, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
